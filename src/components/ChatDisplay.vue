@@ -17,8 +17,7 @@
                      ref="bubbleRefs"
                      class="leading-loose py-3 px-5 shadow-lg rounded-xl text-xs sm:text-sm sm:leading-loose lg:leading-loose break-all overflow-x-auto"
                      :class="[bubble.sender === HOST ? 'md:ml-5 bg-white' : 'bg-indigo-200',
-                     isBouncing[bubble.bubbleIndex] ? 'animate-bounce' : ''
-                     ]"
+                     isBouncing[bubble.bubbleIndex] ? 'animate-bounce' : '']"
                 >
                   <div v-if="bubble.sender === HOST && bubble.bubbleIndex !== 0 && bubble.text.length === 0" role="status">
                     <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,11 +72,11 @@ const addBubble = (message) => {
 }
 
 let eventSource;
+const queue = ref([]);
 const callReactiveMessage = (message) => {
   message = message.replaceAll('{', '%7B').replaceAll('}', '%7D');
 
   bubbles.value.push({sender: HOST, text: [], timestamp: new Date(), bubbleIndex: bubbleIndex++});
-  const lastBubble = bubbles.value[bubbles.value.length - 1];
 
   const url = `${process.env.VUE_APP_CHAT_GPT_BACKEND_URL}/chat?id=${id}&message=${message}`
 
@@ -92,24 +91,46 @@ const callReactiveMessage = (message) => {
   eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data.isFinished === true) {
-      lastBubble.text.push(data.message);
+      queue.value.push(data.message);
       isActive.value = false;
-      displayRef.value.scrollTop = displayRef.value.scrollHeight;
       eventSource.close();
+      displayRef.value.scrollTop = displayRef.value.scrollHeight;
     } else {
-      lastBubble.text.push(data.message);
+      queue.value.push(data.message);
       displayRef.value.scrollTop = displayRef.value.scrollHeight;
     }
   };
 
   eventSource.onerror = () => {
-    lastBubble.text.push(ERROR_MSG);
     eventSource.close();
     isActive.value = false;
+    bubbles.value[bubbles.value.length - 1].text.push(ERROR_MSG);
     displayRef.value.scrollTop = displayRef.value.scrollHeight;
   };
 
 };
+
+
+let isRunning = false;
+
+watch(queue, () => {
+  if (!isRunning) consumeQueuedData();
+}, { deep: true });
+
+const consumeQueuedData = () => {
+  if (queue.value.length > 0) {
+    isRunning = true;
+    console.log(new Date());
+    let dequeuedData = queue.value.shift();
+    setTimeout(() => {
+      bubbles.value[bubbles.value.length - 1].text.push(dequeuedData);
+      displayRef.value.scrollTop = displayRef.value.scrollHeight;
+      consumeQueuedData();
+      isRunning = false;
+    }, 30);
+  }
+};
+
 
 const clickStopButton = () => {
   eventSource.close();

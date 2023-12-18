@@ -50,7 +50,7 @@ import { GREETING_MSG, RE_GREETING_MSG, ERROR_MSG, USER, HOST } from "@/contant.
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { uuid } from "vue3-uuid";
 import axios from "axios";
-import { nextTick, ref, watch, defineEmits, defineExpose } from "vue";
+import { nextTick, ref, watch } from "vue";
 import 'highlight.js/styles/dracula.css';
 
 const emits = defineEmits(['totalBubbles']);

@@ -64,7 +64,7 @@
 
 <script setup>
 
-import { ref, watch, nextTick, defineEmits, defineProps } from "vue";
+import { ref, watch, nextTick } from "vue";
 
 const emits = defineEmits(['addBubble', 'clearBubbles', 'clickStopButton']);
 

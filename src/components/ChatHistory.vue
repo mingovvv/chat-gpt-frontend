@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import {ref, nextTick, watch, defineProps, defineEmits} from "vue";
+import {ref, nextTick, watch} from "vue";
 
 const props = defineProps({
   userBubbles: Array

@@ -21,9 +21,8 @@
           <textarea
               rows="1"
               ref="textareaRef"
-              @keydown.enter.exact.prevent="addBubble"
-              @keydown.shift.enter="text += '\n'"
               v-model="inputText"
+              @keydown.enter.exact.prevent="addBubble"
               class="flex max-h-52 overflow-y-auto w-full focus:outline-none rounded-lg p-2 text-xs sm:text-sm lg:text-base"
               placeholder="무엇이든 물어보세요. 😃"
           />
@@ -67,7 +66,7 @@
 
 import { ref, watch, nextTick, defineEmits, defineProps } from "vue";
 
-const emits = defineEmits(['addBubble', 'clickStopButton']);
+const emits = defineEmits(['addBubble', 'clearBubbles', 'clickStopButton']);
 
 const props = defineProps({
   isActive: Boolean
@@ -78,11 +77,12 @@ const inputText = ref('');
 const sendButtonRef = ref(null);
 const stopButtonRef = ref(null);
 
-const addBubble = () => {
-  if (inputText.value.trim() !== '' && !props.isActive) {
-    console.log('chatinput.addBubble');
+const addBubble = (event) => {
+  if (inputText.value.trim() !== '' && !props.isActive && !event.shiftKey) {
     emits("addBubble", inputText.value);
     inputText.value = ''
+  } else if (event.shiftKey) {
+    inputText.value = inputText.value += '\n';
   }
 }
 

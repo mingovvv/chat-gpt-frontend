@@ -9,7 +9,7 @@
                  class="p-3 rounded-lg font-black"
                  :class="bubble.sender === HOST ? 'col-start-1 col-end-8' : 'col-start-9 col-end-2'"
             >
-              <div class="flex" :class="bubble.sender === HOST ? 'flex-row' : 'flex-row-reverse'">
+              <div class="flex slideUp" :class="bubble.sender === HOST ? 'flex-row' : 'flex-row-reverse'">
                 <img v-if="bubble.sender === HOST"
                      class="hidden items-center justify-center h-10 w-10 rounded-full flex-shrink-0 bg-black md:flex"
                      alt="logo" src="../assets/logo.svg">
@@ -29,7 +29,7 @@
                   </div>
                   <Markdown :source="bubble.text.join('')" />
                 </div>
-                <div class=" mt-auto ml-2 mr-2">
+                <div class="mt-auto ml-2 mr-2">
                   <span class="text-xs text-center text-gray-500 hidden md:flex">{{ bubble.timestamp.toLocaleTimeString() }}</span>
                 </div>
               </div>
@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-      <ChatInput ref="chatInputRef" @addBubble="addBubble" @clearBubbles="clearBubbles"  @clickStopButton="clickStopButton" :is-active="isActive"/>
+      <ChatInput ref="chatInputRef" @addBubble="addBubble" @clearBubbles="clearBubbles" @clickStopButton="clickStopButton" :is-active="isActive"/>
     </div>
   </div>
 </template>
@@ -62,7 +62,7 @@ const isActive = ref(false);
 const isBouncing = ref([]);
 
 let id = uuid.v4();
-console.log(id);
+console.log(process.env.VUE_APP_CHAT_GPT_BACKEND_URL);
 let bubbleIndex = 0;
 const bubbles = ref([{sender: HOST, text: [GREETING_MSG[Math.floor(Math.random() * GREETING_MSG.length)]], timestamp: new Date(), bubbleIndex: bubbleIndex++}]);
 
@@ -74,6 +74,8 @@ const addBubble = (message) => {
 
 let eventSource;
 const callReactiveMessage = (message) => {
+  message = message.replaceAll('{', '%7B').replaceAll('}', '%7D');
+
   bubbles.value.push({sender: HOST, text: [], timestamp: new Date(), bubbleIndex: bubbleIndex++});
   const lastBubble = bubbles.value[bubbles.value.length - 1];
 
@@ -101,10 +103,10 @@ const callReactiveMessage = (message) => {
   };
 
   eventSource.onerror = () => {
-    displayRef.value.scrollTop = displayRef.value.scrollHeight;
     lastBubble.text.push(ERROR_MSG);
     eventSource.close();
     isActive.value = false;
+    displayRef.value.scrollTop = displayRef.value.scrollHeight;
   };
 
 };
@@ -160,4 +162,18 @@ defineExpose({
   border-radius: 0.5rem;
   overflow-x: auto;
 }
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.slideUp {
+  animation: slideUp 300ms forwards;
+}
+
 </style>

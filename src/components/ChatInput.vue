@@ -1,8 +1,10 @@
 <template>
-  <div class="flex flex-row items-center h-20 rounded-xl bg-white w-full px-4 drop-shadow-lg">
+  <div
+      class="flex flex-row items-center max-h-56 rounded-xl bg-white w-full p-2 drop-shadow-lg border-2 border-indigo-200">
     <div>
+      <!-- new topic button -->
       <button @click="clearBubbles"
-              class="hidden sm:flex items-center justify-center h-10 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 rounded-xl text-white px-5"
+              class="hidden sm:flex items-center h-12 rounded-xl text-white px-5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600"
       >
         <span class="hidden lg:flex mr-2">New Topic</span>
         <span>
@@ -12,27 +14,29 @@
         </span>
       </button>
     </div>
-    <div class="flex-grow ml-4">
-      <div class="relative w-full">
-        <!-- user text input -->
+    <div class="flex-grow">
+      <div class="px-2">
+        <!-- textarea -->
         <form @submit.prevent="addBubble">
           <textarea
+              rows="1"
+              ref="textareaRef"
               @keydown.enter.exact.prevent="addBubble"
               @keydown.shift.enter="text += '\n'"
               v-model="inputText"
-              type="text"
-              class="flex w-full border rounded-md focus:outline-none focus:border-indigo-300 p-1.5 h-10 text-xs sm:text-sm lg:text-base disabled"
+              class="flex max-h-52 overflow-y-auto w-full focus:outline-none rounded-lg p-2 text-xs sm:text-sm lg:text-base"
               placeholder="무엇이든 물어보세요. 😃"
           />
         </form>
       </div>
     </div>
-    <div class="ml-4">
+    <div>
       <!-- send button -->
       <button
-          ref="sendButton"
+          ref="sendButtonRef"
+          v-if=!isActive
           @click="addBubble"
-          class="lg:w-24 flex items-center justify-center h-10 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 rounded-xl text-white px-5"
+          class="flex lg:w-24 items-center justify-center h-12 rounded-xl text-white px-5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600"
       >
         <span class="hidden mr-2 lg:flex">Send</span>
         <span>
@@ -41,10 +45,12 @@
           </svg>
         </span>
       </button>
+      <!-- stop button -->
       <button
-          ref="stopButton"
-          @click="stopBubble"
-          class="hidden lg:w-24 flex items-center justify-center h-10 bg-gradient-to-r from-gray-500 to-black hover:from-gray-600 hover:to-gray-900 rounded-xl text-white px-5"
+          ref="stopButtonRef"
+          v-if=isActive
+          @click="$emit('clickStopButton')"
+          class="flex lg:w-24 items-center justify-center h-12 rounded-xl text-white px-5 bg-gradient-to-r from-gray-500 to-black hover:from-gray-600 hover:to-gray-900"
       >
         <span class="hidden mr-2 lg:flex">Stop</span>
         <span>
@@ -57,59 +63,39 @@
   </div>
 </template>
 
-<script>
-import {ref} from 'vue'
+<script setup>
 
-export default {
-  emits: ['addMessage', 'clearBubbles'],
-  setup(props, {emit}) {
+import { ref, watch, nextTick, defineEmits, defineProps } from "vue";
 
-    let eventSourceConn;
-    const inputText = ref('')
-    const sendButton = ref(null);
-    const stopButton = ref(null);
+const emits = defineEmits(['addBubble', 'clickStopButton']);
 
-    const addBubble = () => {
-      if (inputText.value.trim() !== '') {
-        const message = inputText.value;
-        emit("addMessage", message);
-        inputText.value = ''
-      }
-    }
+const props = defineProps({
+  isActive: Boolean
+});
 
-    const clearBubbles = () => {
-      emit('clearBubbles');
-    }
+const textareaRef = ref(null);
+const inputText = ref('');
+const sendButtonRef = ref(null);
+const stopButtonRef = ref(null);
 
-    const activateStopButton = (eventSource) => {
-      sendButton.value.classList.add('hidden');
-      stopButton.value.classList.remove('hidden');
-      eventSourceConn = eventSource;
-      return eventSourceConn;
-    }
-
-    const stopBubble = () => {
-      eventSourceConn.close();
-      activateSendButton();
-    }
-
-    const activateSendButton = () => {
-      sendButton.value.classList.remove('hidden');
-      stopButton.value.classList.add('hidden');
-    }
-
-    return {
-      inputText,
-      sendButton,
-      stopButton,
-      eventSourceConn,
-      addBubble,
-      stopBubble,
-      clearBubbles,
-      activateStopButton,
-      activateSendButton,
-    }
-
+const addBubble = () => {
+  if (inputText.value.trim() !== '' && !props.isActive) {
+    console.log('chatinput.addBubble');
+    emits("addBubble", inputText.value);
+    inputText.value = ''
   }
 }
+
+const clearBubbles = () => {
+  emits('clearBubbles');
+  inputText.value = ''
+}
+
+watch(inputText, () => {
+  nextTick(() => {
+    textareaRef.value.style.height = '1.5rem';
+    textareaRef.value.style.height = `${textareaRef.value.scrollHeight}px`;
+  })
+})
+
 </script>

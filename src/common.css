@@ -1,0 +1,16 @@
+/* 웹킷 브라우저 (Chrome, Safari 등)를 위한 스타일 */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #5f90d4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4871ab;
+}

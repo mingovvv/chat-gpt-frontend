@@ -60,9 +60,10 @@ const chatInputRef = ref(null);
 const isActive = ref(false);
 const isBouncing = ref([]);
 
+// backend 단으로 호출하는 클라이언트 ID (UUID로 대체)
 let id = uuid.v4();
-console.log(process.env.VUE_APP_CHAT_GPT_BACKEND_URL);
 let bubbleIndex = 0;
+
 const bubbles = ref([{sender: HOST, text: [GREETING_MSG[Math.floor(Math.random() * GREETING_MSG.length)]], timestamp: new Date(), bubbleIndex: bubbleIndex++}]);
 
 const addBubble = (message) => {
@@ -120,7 +121,6 @@ watch(queue, () => {
 const consumeQueuedData = () => {
   if (queue.value.length > 0) {
     isRunning = true;
-    console.log(new Date());
     let dequeuedData = queue.value.shift();
     setTimeout(() => {
       bubbles.value[bubbles.value.length - 1].text.push(dequeuedData);

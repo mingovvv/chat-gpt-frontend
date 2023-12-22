@@ -28,13 +28,13 @@ jobs:
 
     - name: Get short SHA
       id: short-sha
-      run: echo "::set-output name=sha::$(echo ${GITHUB_SHA:0:7})"
+      run: echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ steps.short-sha.outputs.sha }}
+        tags: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ env.SHORT_SHA }}
         file: ./Dockerfile
 
   deploy:
@@ -52,4 +52,4 @@ jobs:
         app-name: 'mingo-chat'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_97191aa39f084223ae3b16988e163efe }}
-        images: 'mingocontainerregistry.azurecr.io/chat-gpt-front:${{ steps.short-sha.outputs.sha }}'
+        images: 'mingocontainerregistry.azurecr.io/chat-gpt-front:${{ env.SHORT_SHA }}'

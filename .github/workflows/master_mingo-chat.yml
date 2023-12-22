@@ -26,11 +26,15 @@ jobs:
         username: ${{ secrets.AzureAppService_ContainerUsername_7c70cb2bf07e4abf80c9df2f5d7a2c50 }}
         password: ${{ secrets.AzureAppService_ContainerPassword_d19f925395e34a4fa212480da2e1f5e3 }}
 
+    - name: Get short SHA
+      id: short-sha
+      run: echo "::set-output name=sha::$(echo ${GITHUB_SHA:0:7})"
+
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ github.sha:0:7 }}
+        tags: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ steps.short-sha.outputs.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -48,4 +52,4 @@ jobs:
         app-name: 'mingo-chat'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_97191aa39f084223ae3b16988e163efe }}
-        images: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ github.sha:0:7 }}
+        images: 'mingocontainerregistry.azurecr.io/chat-gpt-front:${{ steps.short-sha.outputs.sha }}'

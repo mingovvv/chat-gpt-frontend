@@ -3,7 +3,7 @@ name: Push to ACR
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:

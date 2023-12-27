@@ -10,5 +10,5 @@ RUN yarn run build
 # for runtime
 FROM nginx:1.21.1-alpine AS runtime
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

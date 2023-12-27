@@ -24,7 +24,7 @@
               v-model="inputText"
               @keydown.enter.exact.prevent="addBubble"
               class="flex max-h-52 overflow-y-auto w-full focus:outline-none rounded-lg p-2 text-xs sm:text-sm lg:text-base"
-              placeholder="무엇이든 물어보세요... 😃"
+              placeholder="무엇이든 물어보세요..! 😃"
           />
         </form>
       </div>

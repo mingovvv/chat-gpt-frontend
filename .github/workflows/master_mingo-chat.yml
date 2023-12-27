@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy container app to Azure Web App - mingo-chat
 
 on:
@@ -11,23 +14,23 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v2
 
     - name: Log in to registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@v2
       with:
         registry: https://mingocontainerregistry.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_7c70cb2bf07e4abf80c9df2f5d7a2c50 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_d19f925395e34a4fa212480da2e1f5e3 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_f9e4ba1486aa4a8f988d461fb9c519fa }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_7a66607da07b456d9dce24abef67a9a3 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ github.sha }}
+        tags: mingocontainerregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f9e4ba1486aa4a8f988d461fb9c519fa }}/chat-gpt-front:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -44,5 +47,5 @@ jobs:
       with:
         app-name: 'mingo-chat'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_97191aa39f084223ae3b16988e163efe }}
-        images: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ github.sha }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_c82d08300d8f421497fdf07dc6810500 }}
+        images: 'mingocontainerregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f9e4ba1486aa4a8f988d461fb9c519fa }}/chat-gpt-front:${{ github.sha }}'

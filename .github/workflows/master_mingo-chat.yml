@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: mingocontainerregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f9e4ba1486aa4a8f988d461fb9c519fa }}/chat-gpt-front:${{ github.sha }}
+        tags: mingocontainerregistry.azurecr.io/chat-gpt-front:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -48,4 +48,4 @@ jobs:
         app-name: 'mingo-chat'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_c82d08300d8f421497fdf07dc6810500 }}
-        images: 'mingocontainerregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f9e4ba1486aa4a8f988d461fb9c519fa }}/chat-gpt-front:${{ github.sha }}'
+        images: 'mingocontainerregistry.azurecr.io/chat-gpt-front:${{ github.sha }}'
